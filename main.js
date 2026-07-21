@@ -42,6 +42,34 @@ var DEFAULT_SETTINGS = {
   markLowConfidenceMatches: true,
   preferredFoods: ""
 };
+function parseSettings(data) {
+  if (!isRecord(data)) {
+    return {};
+  }
+  return {
+    usdaApiKey: readString(data, "usdaApiKey"),
+    ingredientDelimiter: readString(data, "ingredientDelimiter"),
+    includeMacros: readBoolean(data, "includeMacros"),
+    addSectionTotals: readBoolean(data, "addSectionTotals"),
+    showMatchPreview: readBoolean(data, "showMatchPreview"),
+    markLowConfidenceMatches: readBoolean(data, "markLowConfidenceMatches"),
+    preferredFoods: readString(data, "preferredFoods")
+  };
+}
+function isRecord(value) {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+function readString(data, key) {
+  const value = data[key];
+  return typeof value === "string" ? value : void 0;
+}
+function readBoolean(data, key) {
+  const value = data[key];
+  return typeof value === "boolean" ? value : void 0;
+}
+function isKcalCalcSettingKey(key) {
+  return key in DEFAULT_SETTINGS;
+}
 var KcalCalcPlugin = class extends import_obsidian.Plugin {
   constructor() {
     super(...arguments);
@@ -62,7 +90,11 @@ var KcalCalcPlugin = class extends import_obsidian.Plugin {
     this.addSettingTab(new KcalCalcSettingTab(this.app, this));
   }
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    const savedData = await this.loadData();
+    this.settings = {
+      ...DEFAULT_SETTINGS,
+      ...parseSettings(savedData)
+    };
   }
   async saveSettings() {
     await this.saveData(this.settings);
@@ -366,6 +398,9 @@ function parsePreferredFoods(preferredFoods) {
   if (trimmedPreferredFoods.startsWith("{")) {
     try {
       const parsed = JSON.parse(trimmedPreferredFoods);
+      if (!isRecord(parsed)) {
+        return aliases;
+      }
       for (const [alias, query] of Object.entries(parsed)) {
         if (typeof query === "string" && alias.trim() && query.trim()) {
           aliases.set(normalizePreferredFoodKey(alias), query.trim());
@@ -452,6 +487,90 @@ var KcalCalcSettingTab = class extends import_obsidian.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
     this.plugin = plugin;
+  }
+  getSettingDefinitions() {
+    return [
+      {
+        name: "USDA API key",
+        desc: "Used for FoodData Central ingredient searches.",
+        control: {
+          type: "text",
+          key: "usdaApiKey",
+          placeholder: "api.data.gov key"
+        }
+      },
+      {
+        name: "Ingredient delimiter",
+        desc: "Separates the food name from the amount.",
+        control: {
+          type: "text",
+          key: "ingredientDelimiter",
+          placeholder: DEFAULT_INGREDIENT_DELIMITER
+        }
+      },
+      {
+        name: "Include macros",
+        desc: "Add protein, carbs, and fat next to each kcal value when USDA provides them.",
+        control: {
+          type: "toggle",
+          key: "includeMacros"
+        }
+      },
+      {
+        name: "Add section totals",
+        desc: "Add an underlined section total before the next Markdown heading.",
+        control: {
+          type: "toggle",
+          key: "addSectionTotals"
+        }
+      },
+      {
+        name: "Show match preview",
+        desc: "Review USDA matches before the note is changed.",
+        control: {
+          type: "toggle",
+          key: "showMatchPreview"
+        }
+      },
+      {
+        name: "Mark low-confidence matches",
+        desc: "Append a review marker when the ingredient differs from the USDA match.",
+        control: {
+          type: "toggle",
+          key: "markLowConfidenceMatches"
+        }
+      },
+      {
+        name: "Preferred foods",
+        desc: "One alias per line, for example: whey = Whey protein powder",
+        control: {
+          type: "textarea",
+          key: "preferredFoods",
+          placeholder: "whey = Whey protein powder\ndark choc = Chocolate, dark, 70-85% cacao solids",
+          rows: 6
+        }
+      }
+    ];
+  }
+  getControlValue(key) {
+    if (isKcalCalcSettingKey(key)) {
+      return this.plugin.settings[key];
+    }
+    return void 0;
+  }
+  async setControlValue(key, value) {
+    if (!isKcalCalcSettingKey(key)) {
+      return;
+    }
+    if (key === "usdaApiKey" || key === "ingredientDelimiter" || key === "preferredFoods") {
+      this.plugin.settings[key] = typeof value === "string" ? value : DEFAULT_SETTINGS[key];
+    } else {
+      this.plugin.settings[key] = typeof value === "boolean" ? value : DEFAULT_SETTINGS[key];
+    }
+    if (key === "usdaApiKey" || key === "preferredFoods") {
+      this.plugin.clearLookupCache();
+    }
+    await this.plugin.saveSettings();
   }
   display() {
     const { containerEl } = this;

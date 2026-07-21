@@ -1,6 +1,6 @@
 import esbuild from "esbuild";
 import process from "process";
-import builtins from "builtin-modules";
+import { builtinModules } from "node:module";
 
 const production = process.argv[2] === "production";
 
@@ -24,7 +24,7 @@ await esbuild.build({
     "@lezer/common",
     "@lezer/highlight",
     "@lezer/lr",
-    ...builtins
+    ...builtinModules
   ],
   format: "cjs",
   target: "es2018",
