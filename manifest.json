@@ -1,7 +1,7 @@
 {
   "id": "kcal-calc",
   "name": "Kcal Calc",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "minAppVersion": "1.5.0",
   "description": "Annotates ingredient lines with kcal values from USDA FoodData Central.",
   "author": "13Green13",

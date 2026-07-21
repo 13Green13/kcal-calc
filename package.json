@@ -1,6 +1,6 @@
 {
   "name": "kcal-calc",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Obsidian plugin that annotates ingredient lines with kcal values from USDA FoodData Central.",
   "main": "main.js",
   "scripts": {
