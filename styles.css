@@ -1,0 +1,28 @@
+.kcal-calc-total {
+  text-decoration: underline;
+}
+
+.kcal-calc-preview table {
+  border-collapse: collapse;
+  margin-block: 1em;
+  width: 100%;
+}
+
+.kcal-calc-preview th,
+.kcal-calc-preview td {
+  border-bottom: 1px solid var(--background-modifier-border);
+  padding: 6px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.kcal-calc-preview-warning {
+  color: var(--text-warning);
+}
+
+.kcal-calc-preview-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 1em;
+}
