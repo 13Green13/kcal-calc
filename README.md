@@ -4,6 +4,9 @@ Kcal Calc is an Obsidian plugin that scans the active Markdown note for ingredie
 
 For the plugin to work, you will need to add your API key in the plugin settings, you can get your API key for free here https://fdc.nal.usda.gov/api-key-signup
 
+<img width="531" height="229" alt="image" src="https://github.com/user-attachments/assets/ed67f85f-0fcc-47b1-839d-a78dd9b7eb95" />
+
+
 ## Network use and privacy
 
 Kcal Calc uses the USDA FoodData Central API at `https://api.nal.usda.gov/fdc/v1/foods/search` to look up ingredient nutrition data. When you run the annotation command, the plugin sends each ingredient search query and your USDA API key to USDA FoodData Central. This network access is required for nutrition lookup.
