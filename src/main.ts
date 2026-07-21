@@ -577,7 +577,9 @@ function parsePreferredFoods(preferredFoods: string): Map<string, string> {
         return aliases;
       }
 
-      for (const [alias, query] of Object.entries(parsed)) {
+      for (const alias of Object.keys(parsed)) {
+        const query = parsed[alias];
+
         if (typeof query === "string" && alias.trim() && query.trim()) {
           aliases.set(normalizePreferredFoodKey(alias), query.trim());
         }
