@@ -32,5 +32,5 @@ await esbuild.build({
   sourcemap: production ? false : "inline",
   treeShaking: true,
   outfile: "main.js",
-  minify: production
+  minify: false
 });
